@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Calculadora de Integrales | Nerdamer</title>
+
+    <!-- Nerdamer -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nerdamer/1.1.13/nerdamer.core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nerdamer/1.1.13/Algebra.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nerdamer/1.1.13/Calculus.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nerdamer/1.1.13/Solve.min.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: linear-gradient(135deg, #1d2671, #c33764);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .app {
+            background: #ffffff;
+            width: 95%;
+            max-width: 900px;
+            border-radius: 18px;
+            padding: 30px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        header h1 {
+            color: #1d2671;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            color: #555;
+            font-size: 15px;
+        }
+
+        .calculator {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .panel {
+            background: #f4f6fb;
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .panel h2 {
+            color: #c33764;
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-top: 12px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+        }
+
+        button {
+            margin-top: 18px;
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #1d2671, #c33764);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.03);
+            opacity: 0.9;
+        }
+
+        .result {
+            background: #fff;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+            min-height: 60px;
+            border-left: 5px solid #1d2671;
+        }
+
+        .result strong {
+            color: #1d2671;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        @media (max-width: 700px) {
+            .calculator {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <header>
+        <h1>Calculadora de Integrales</h1>
+        <p>Basada en Nerdamer · Integrales indefinidas y definidas</p>
+    </header>
+
+    <div class="calculator">
+
+        <!-- Panel de entrada -->
+        <div class="panel">
+            <h2>Datos de la Integral</h2>
+
+            <label for="function">Función f(x)</label>
+            <input type="text" id="function" placeholder="Ej: x^2 + sin(x)">
+
+            <label for="type">Tipo de integral</label>
+            <select id="type" onchange="toggleLimits()">
+                <option value="indefinite">Indefinida</option>
+                <option value="definite">Definida</option>
+            </select>
+
+            <div id="limits" style="display:none;">
+                <label for="a">Límite inferior (a)</label>
+                <input type="number" id="a">
+
+                <label for="b">Límite superior (b)</label>
+                <input type="number" id="b">
+            </div>
+
+            <button onclick="calculateIntegral()">Calcular Integral</button>
+        </div>
+
+        <!-- Panel de resultado -->
+        <div class="panel">
+            <h2>Resultado</h2>
+
+            <div class="result" id="output">
+                <strong>Resultado:</strong>
+                <div>Introduce una función para comenzar.</div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        © 2026 · Calculadora Integral con Nerdamer
+    </footer>
+</div>
+
+<script>
+    function toggleLimits() {
+        const type = document.getElementById("type").value;
+        const limits = document.getElementById("limits");
+        limits.style.display = type === "definite" ? "block" : "none";
+    }
+
+    function calculateIntegral() {
+        const func = document.getElementById("function").value;
+        const type = document.getElementById("type").value;
+        const output = document.getElementById("output");
+
+        try {
+            let result;
+
+            if (type === "indefinite") {
+                result = nerdamer.integrate(func, 'x').toString() + " + C";
+            } else {
+                const a = document.getElementById("a").value;
+                const b = document.getElementById("b").value;
+
+                if (a === "" || b === "") {
+                    throw "Debes introducir los límites";
+                }
+
+                result = nerdamer.integrate(func, 'x', a, b).evaluate().toString();
+            }
+
+            output.innerHTML = `
+                <strong>Resultado:</strong>
+                <div>${result}</div>
+            `;
+        } catch (error) {
+            output.innerHTML = `
+                <strong>Error:</strong>
+                <div>La función o los datos no son válidos.</div>
+            `;
+        }
+    }
+</script>
+
+</body>
+</html>
